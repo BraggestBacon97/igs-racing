@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formel1 In Schools IGS-WHV</title>
+</head>
+<body>
+    <style>
+        body{
+            background-image: url('RÜCKENBODDEN 16 9.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: rgb(32, 32, 32);
+            color: white;
+            font-family: Lucida Sans;
+        }
+        background-image {
+            height: auto;
+            width: 100%;
+        }
+        header{
+            background-color: rgb(112, 0, 163);
+            outline: solid ;
+            color: aliceblue;
+            padding: auto;
+            width: 80%;
+            border-radius: 40px;
+            outline-color: rgb(100, 97, 97);
+            outline-width: 0.2rem;
+
+        }
+        nav{
+            width: 75%;
+            padding: 0.2rem;
+        }
+        nav li{
+            display: inline;
+            margin-right: 1rem;
+            padding: 0.5rem;
+        }
+        nav ul{
+            padding: 0;
+            margin: 0.5rem;
+        }
+        ul marker {
+            font-size: 1.5rem;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        nav a:hover {
+             color: rgb(53, 51, 51);
+        }
+        main a:hover {
+             color: rgb(90, 89, 89);
+        }
+        #textbox{
+            background-color: rgb(100, 97, 97);
+            color: white;
+            outline: solid ;
+            outline-color: rgb(145, 145, 145);
+            outline-width: 0.05rem;
+            border-radius: 25px;
+            padding: 0.5rem;
+            margin: 1rem 0;
+            border-radius: 25px;
+
+        }
+        footer{
+            background-color:  rgb(100, 97, 97) ;
+            color: white;
+            outline: solid ;
+            outline-color: white;
+            outline-width: 0.05rem;
+            padding: 0.5rem;
+            margin: 2rem;
+            width: 72%;
+            outline-color: rgb(145, 145, 145);
+            outline-width: 0.05rem;
+            border-radius: 25px;
+
+        }
+        .outline {
+            outline: solid;
+            outline-color: white;
+            outline-width: 0,05rem;
+            border-radius: 10px;
+        }
+        .sponsor {
+            display: inline;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            width:auto;
+            height: 50px;
+        }
+        footer p{
+            margin-right: 1rem;
+        }
+        header li{
+            display: inline;
+            margin-left: 0.3rem;
+
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        header img {
+            width: 200px;
+            max-height:auto;
+        }
+
+        .text {
+            font-size: 20px;
+            padding-left: 5px;
+            font-family: Lucida Console;
+        }
+        a main{
+            padding: 0.2rem;
+        }
+        .sponsor-schrift {
+            line-height: 50px;
+            color: black;
+        }
+        footer li{
+            display: inline;
+
+
+        }
+        .Satz-block{
+            text-align: justify;
+            width: 600px;
+            height: auto;
+            padding: 1rem;
+        }
+        .logo-dieKIS{
+            max-height: 150px;
+            width: auto;
+            padding: 5px;
+        }
+
+
+    </style>
+<div align="center">
+ <header>
+    <div class="container">
+        <div class="header image">
+           <img class="logo-dieKIS" src="bilder/logo-neu.png">
+        </div>
+    <div class="text">
+        <h1>DIE KI'S</h1>
+    </div>
+</div>
+ </header>
+ <nav>
+    <div id="textbox">
+    <ul>
+        <li><a href="Formel 1 in schools.html">Was ist "Formel 1 in School's"?</a></li>
+        <li><a href="Unser Team.html">Unser Team</a></li>
+        <li><a href="sponsor.html">Sponsor</a></li>
+        <li><a href="Kosten und Material.html">Kosten und Material</a></li>
+    </ul>
+    </div>
+ </nav>
+ <main>
+    <h2>Das Wettbewerbs-Modell 2025</h2>
+    <img class="outline" src="bilder/violet viper.png" width="600px" height=auto;/>
+    <p>Die Violet Viper: Platz 2 in Niedersachsen</p>
+    <br>
+    <u>Wer sind wir?</u>
+    <p class="Satz-block">
+        Wir sind eine Gruppe von drei ambitionierten Schülern aus dem neunten Jahrgang
+        der IGS Wilhelmshaven und nehmen an dem internationalen F1 in schools Wettbewerb teil.
+        Auf der Meisterschaft Nord-West erreichten wir den 2 Platz in Niedersachsen und den 9ten Platz
+        der Regionalen Gesamt-Platzierung.
+    </p>
+    <br>
+    <h2>
+        Kontakt
+    </h2>
+    <p>
+        Falls Sie uns Kontaktieren wollen, können sie dies über die Email Adresse:
+    </p>
+    <a href="mailto:die.kis.2022@gmail.com">Die.KIs.2022@gmail.com</a>
+    <p>
+        (Wird min. jeden Freitag Kontrolliert, in Ferienzeiten irregulär)
+    </p>
+    <p>
+        Die Teambetreuung erreichen Sie unter:
+    </p>
+    <a href="mailto:f1@igs-whv.de">f1@igs-whv.de</a>
+ </main>
+ <footer>
+    <ul>
+        <li>
+            SPONSOREN:
+        </li>
+        <li>
+            <a href="https://printuniq.de"><img class="sponsor" src="bilder/printuniq_logo_white.png"/></a>
+        </li>
+        <li>
+            <a href="https://wilhelmshavener-zeitung.de"><img class="sponsor" src="bilder/wz-logo.jpg"/></a>
+        </li>
+        <li>
+            <a href="https://www.igswhv.de/"><img class="sponsor" src="bilder/igs-logo.jpg"/></a>
+        </li>
+    </ul>
+
+    <p>
+        PARTNER:
+        <a href="https://simscale.com"><img class="sponsor" src="bilder/simscale-logo.jpg" width="100" height="20px"/></a>
+    </p>
+    <br>
+ </footer>
+</div>
+
+</body>
+</html>

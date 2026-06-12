@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>StemRacing</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #07090f; color: #fff;
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport: accounts for mobile browser chrome */
+  overflow: hidden;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+  /* Safe area insets for iPhone notch + Android nav bar */
+  padding-top:    env(safe-area-inset-top,    0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left:   env(safe-area-inset-left,   0px);
+  padding-right:  env(safe-area-inset-right,  0px);
+}
+#wrapper { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+/* FIX 1: fixed-width HUD columns so score/speed never shift layout */
+#hud {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 100%; padding: 6px 12px;
+  font-size: 12px; font-weight: 600;
+  font-family: 'Orbitron', monospace;
+  font-variant-numeric: tabular-nums;
+}
+#hud > div:nth-child(1) { text-align: left; }
+#hud > div:nth-child(2) { text-align: center; }
+#hud > div:nth-child(3) { text-align: right; }
+#hud span { color: #66bbff; }
+#hud .hi { color: #ffd700; }
+
+canvas { display: block; border-radius: 14px; box-shadow: 0 0 60px #0044ff22; }
+
+#controls {
+  display: none; width: 100%;
+  justify-content: space-between; gap: 12px;
+  margin-top: 8px; padding: 0 4px;
+  /* Extra bottom padding so buttons clear Android nav bar / iPhone home bar */
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+}
+.btn {
+  flex: 1; padding: 20px 10px; font-size: 28px;
+  border-radius: 18px; border: 2px solid #0055ff44;
+  background: linear-gradient(180deg,#0033aa22,#001166bb);
+  color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.btn:active { background: linear-gradient(180deg,#0055ff66,#002299bb); transform: scale(0.96); }
+
+#overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(4,6,18,0.93);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border-radius: 14px; gap: 12px;
+  backdrop-filter: blur(10px); z-index: 10;
+  padding: 20px 16px;
+}
+#overlay.hidden { display: none; }
+#overlay h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: 26px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 4px; color: #ff3333;
+  text-shadow: 0 0 30px #ff000088;
+}
+#overlay h2.t {
+  color: #33aaff; text-shadow: 0 0 30px #0066ffaa;
+  font-size: 28px; letter-spacing: 6px;
+}
+.sbox { text-align: center; line-height: 1.8; }
+.sbox .lbl { font-size: 11px; color: #445566; text-transform: uppercase; letter-spacing: 2px; }
+.sbox .val { font-size: 40px; font-weight: 900; color: #fff; font-family: 'Orbitron', monospace; font-variant-numeric: tabular-nums; }
+.sbox .best { font-size: 14px; color: #ffd700; }
+
+.action-btn {
+  margin-top: 2px; padding: 13px 36px; font-size: 14px; font-weight: 700;
+  border-radius: 50px; border: none;
+  background: linear-gradient(135deg,#0055ff,#002ecc);
+  color: #fff; cursor: pointer;
+  box-shadow: 0 4px 24px #0044ffaa;
+  text-transform: uppercase; letter-spacing: 2px;
+  font-family: 'Orbitron', monospace;
+}
+.action-btn:active { transform: scale(0.95); }
+.action-btn.sec {
+  background: transparent; border: 2px solid #223;
+  color: #667; box-shadow: none; font-size: 12px; padding: 9px 24px;
+}
+.action-btn.sec:active { color: #aac; border-color: #446; }
+
+.drow { display: flex; gap: 8px; }
+.dbtn {
+  padding: 7px 14px !important; font-size: 11px !important;
+  border-radius: 20px !important; border: 2px solid #1a1a2a !important;
+  background: #0a0a18 !important; box-shadow: none !important;
+  color: #556 !important; flex: unset !important;
+  font-family: 'Orbitron', monospace !important; letter-spacing: 1px !important;
+  text-transform: uppercase !important; cursor: pointer;
+}
+.dbtn.on { border-color: #0055ff !important; background: #001155 !important; color: #88aaff !important; box-shadow: 0 0 14px #0044ff44 !important; }
+
+.name-row { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; max-width: 200px; }
+.name-row label { font-size: 10px; color: #445; text-transform: uppercase; letter-spacing: 1px; font-family: 'Orbitron', monospace; }
+.name-input {
+  width: 100%; padding: 9px 12px; font-size: 16px; font-weight: 700;
+  border-radius: 10px; border: 2px solid #1a2a44;
+  background: #0a0f1e; color: #fff;
+  font-family: 'Orbitron', monospace; text-align: center; text-transform: uppercase;
+  letter-spacing: 3px; outline: none;
+}
+.name-input:focus { border-color: #0055ff; box-shadow: 0 0 12px #0033ff44; }
+
+/* Leaderboard panel */
+#lb-panel {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(4,6,18,0.97);
+  display: flex; flex-direction: column; align-items: center;
+  border-radius: 14px; backdrop-filter: blur(10px); z-index: 20;
+  padding: 16px 12px 10px; overflow: hidden;
+}
+#lb-panel.hidden { display: none; }
+#lb-panel h3 {
+  font-family: 'Orbitron', monospace; font-size: 15px;
+  letter-spacing: 4px; color: #ffd700;
+  text-shadow: 0 0 20px #ffaa0066; margin-bottom: 8px;
+  text-transform: uppercase;
+}
+#lb-list { width: 100%; overflow-y: auto; flex: 1; }
+#lb-list::-webkit-scrollbar { width: 3px; }
+#lb-list::-webkit-scrollbar-thumb { background: #0044ff55; border-radius: 4px; }
+.lb-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px; margin-bottom: 4px;
+  background: #0a0f1e; border: 1px solid #111a2e;
+}
+.lb-row.me { border-color: #0055ff66; background: #001040; }
+.lb-row.gold { border-color: #ffd70044; background: #1a1200; }
+.lb-row .rank { font-family: 'Orbitron', monospace; font-size: 11px; color: #334; min-width: 24px; text-align: center; }
+.lb-row.gold .rank { color: #ffd700; }
+.lb-row .lbname { flex: 1; font-size: 12px; font-weight: 700; color: #99aacc; text-transform: uppercase; letter-spacing: 1px; font-family: 'Orbitron', monospace; }
+.lb-row.me .lbname { color: #66aaff; }
+.lb-row .pts { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+.diff-badge { font-size: 9px; padding: 2px 6px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.badge-easy   { background: #002200; color: #33ee33; }
+.badge-normal { background: #002211; color: #33eebb; }
+.badge-hard   { background: #220011; color: #ff3355; }
+.lb-empty { text-align: center; color: #334; font-size: 13px; padding: 30px 0; }
+.lb-loading { text-align: center; color: #446; font-size: 12px; padding: 20px 0; font-family: 'Orbitron', monospace; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+.tab-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.tab {
+  padding: 5px 12px; border-radius: 14px; font-size: 10px; font-weight: 700;
+  border: 2px solid #1a1a2a; background: transparent; color: #445;
+  cursor: pointer; font-family: 'Orbitron', monospace; letter-spacing: 1px; text-transform: uppercase;
+}
+.tab.on { border-color: #0055ff55; background: #001040; color: #88aaff; }
+.lb-err { text-align: center; color: #633; font-size: 11px; padding: 16px 10px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="wrapper">
+  <div id="hud">
+    <div>Score: <span id="sc">0</span></div>
+    <div>Speed: <span id="sp">1.0x</span></div>
+    <div class="hi">Best: <span id="bs">0</span></div>
+  </div>
+  <canvas id="game"></canvas>
+
+  <div id="overlay">
+    <h2 class="t">🏎 STEMRACING</h2>
+    <div class="name-row">
+      <label>Dein Name</label>
+      <input class="name-input" id="playerName" maxlength="12" placeholder="fucker123">
+    </div>
+    <div class="drow">
+      <button class="btn dbtn on" data-d="easy">Easy</button>
+      <button class="btn dbtn" data-d="normal">Normal</button>
+      <button class="btn dbtn" data-d="hard">Hard</button>
+    </div>
+    <button class="action-btn" id="sb">▶ Start</button>
+    <button class="action-btn sec" id="lbBtn">🏆 Leaderboard</button>
+    <div style="font-size:10px;color:#223;margin-top:-4px;">← → Tasten · Touch-Buttons</div>
+  </div>
+
+  <div id="lb-panel" class="hidden">
+    <h3>🏆 Leaderboard</h3>
+    <div class="tab-row">
+      <button class="tab on" data-t="all">Alle</button>
+      <button class="tab" data-t="easy">Easy</button>
+      <button class="tab" data-t="normal">Normal</button>
+      <button class="tab" data-t="hard">Hard</button>
+    </div>
+    <div id="lb-list"><div class="lb-loading">Laden...</div></div>
+    <button class="action-btn sec" id="lbClose" style="margin-top:8px;flex-shrink:0;">✕ Schließen</button>
+  </div>
+
+  <div id="controls">
+    <button id="left-btn" class="btn">◀</button>
+    <button id="right-btn" class="btn">▶</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("game"), ctx = canvas.getContext("2d");
+const isT = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+let W,H,RL,RR,RW, player, obs=[], speed, score, running=false;
+let lane = 1, targetX = 0; // 0..2 lanes (center start), targetX used for smooth lane movement
+let roadOff=0, lastT=0, cooldown=0, lastLane=-1, diff="easy";
+let hs = parseInt(localStorage.getItem("srhs")||"0");
+let playerName = localStorage.getItem("srname") || "";
+let parts=[], mL=false, mR=false, lbFilter="all";
+
+const DS = {
+  easy:   { s:5,   m:0.0025, st:3.8, spBase:60,  gapBase:120 },
+  normal: { s:6,   m:0.0018, st:4.1, spBase:48,  gapBase:140 },
+  hard:   { s:8.5, m:0.0028, st:4.6, spBase:30,  gapBase:100 },
+};
+const COLS = ["#ff2222","#ff6600","#cc00ff","#0099ff","#ff0077","#ffcc00","#00ccff"];
+
+function dynamicGap(){
+  const cfg=DS[diff], ratio=speed/cfg.s;
+  return cfg.gapBase * ratio * (W/360);
+}
+function dynamicCooldown(){
+  const cfg=DS[diff], ratio=speed/cfg.s;
+  return Math.max(cfg.spBase*0.45, cfg.spBase/Math.sqrt(ratio));
+}
+
+// ── Resize ──────────────────────────────────────────────────────────────────
+function resize(){
+  /* visualViewport excludes the browser chrome (address bar, nav bar) on mobile */
+  const vvh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const vvw = window.visualViewport ? window.visualViewport.width  : window.innerWidth;
+  const mw=Math.min(vvw,420), mh=vvh-120;
+  const asp=360/620; let w=mw-16, h=w/asp;
+  if(h>mh){h=mh;w=h*asp;}
+  canvas.width=W=Math.floor(w); canvas.height=H=Math.floor(h);
+  canvas.style.width=W+"px"; canvas.style.height=H+"px";
+  RL=Math.floor(W*0.22); RR=Math.floor(W*0.78); RW=RR-RL;
+  if(player) resetP();
+}
+function resetP(){ player={x:W/2-W*0.055, y:H*0.78, w:W*0.11, h:H*0.13};
+  // place player in center lane
+  lane = 1;
+  targetX = RL + (lane + 0.5) * (RW/3) - player.w/2;
+  player.x = targetX;
+}
+function initGame(){
+  speed=DS[diff].s; score=0; obs=[]; parts=[];
+  roadOff=0; cooldown=0; lastLane=-1; running=true;
+  resetP();
+}
+
+// ── Particles ────────────────────────────────────────────────────────────────
+function spawnParts(x,y,col,n=7){ for(let i=0;i<n;i++) parts.push({x,y,vx:(Math.random()-.5)*6,vy:Math.random()*-5-1,life:1,col,sz:Math.random()*5+2}); }
+function updParts(d){ parts.forEach(p=>{p.x+=p.vx*d;p.y+=p.vy*d;p.vy+=0.2*d;p.life-=0.04*d;}); parts=parts.filter(p=>p.life>0); }
+function drawParts(){ parts.forEach(p=>{ctx.save();ctx.globalAlpha=p.life;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill();ctx.restore();}); }
+
+// ── Road ─────────────────────────────────────────────────────────────────────
+function drawRoad(){
+  const g=ctx.createLinearGradient(0,0,W,0);
+  g.addColorStop(0,"#061004");g.addColorStop(.5,"#0d180b");g.addColorStop(1,"#061004");
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const rg=ctx.createLinearGradient(RL,0,RR,0);
+  rg.addColorStop(0,"#1a1a1a");rg.addColorStop(.5,"#242424");rg.addColorStop(1,"#1a1a1a");
+  ctx.fillStyle=rg; ctx.fillRect(RL,0,RW,H);
+  ctx.shadowColor="#ffcc00"; ctx.shadowBlur=12;
+  ctx.strokeStyle="#ffcc00bb"; ctx.lineWidth=3; ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(RL,0);ctx.lineTo(RL,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(RR,0);ctx.lineTo(RR,H);ctx.stroke();
+  ctx.shadowBlur=0;
+  const dl=H*.065;
+  ctx.strokeStyle="#ffffff77"; ctx.lineWidth=2;
+  ctx.setLineDash([dl,dl]); ctx.lineDashOffset=-(roadOff%(dl*2));
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+  ctx.strokeStyle="#ffffff1a"; ctx.lineWidth=1;
+  [RL+RW/3,RL+2*RW/3].forEach(lx=>{ctx.beginPath();ctx.moveTo(lx,0);ctx.lineTo(lx,H);ctx.stroke();});
+  ctx.setLineDash([]);
+}
+
+// ── Car ──────────────────────────────────────────────────────────────────────
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+function shade(c,p){return"#"+[1,3,5].map(i=>Math.max(0,Math.min(255,parseInt(c.slice(i,i+2),16)+p)).toString(16).padStart(2,"0")).join("");}
+function drawCar(x,y,w,h,col,isP){
+  ctx.save();
+  const bg=ctx.createLinearGradient(x,y,x+w,y);
+  bg.addColorStop(0,shade(col,-35));bg.addColorStop(.5,col);bg.addColorStop(1,shade(col,-35));
+  ctx.fillStyle=bg;rr(x,y+h*.1,w,h*.82,5);
+  ctx.fillStyle=shade(col,25);rr(x+w*.15,y+h*.2,w*.7,h*.42,4);
+  ctx.fillStyle=isP?"#aafff099":"#ff999933";rr(x+w*.18,y+h*.22,w*.64,h*.32,3);
+  ctx.fillStyle="#0a0a0a";
+  [[x-w*.08,y+h*.16],[x+w*.92,y+h*.16],[x-w*.08,y+h*.58],[x+w*.92,y+h*.58]].forEach(([wx,wy])=>{
+    rr(wx,wy,w*.14,h*.24,3);
+    ctx.fillStyle="#444";ctx.beginPath();ctx.arc(wx+w*.07,wy+h*.12,w*.04,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#0a0a0a";
+  });
+  if(isP){
+    ctx.fillStyle="#ffffbbcc";ctx.shadowColor="#ffffaa";ctx.shadowBlur=16;
+    rr(x+w*.07,y,w*.26,h*.09,2);rr(x+w*.67,y,w*.26,h*.09,2);
+    ctx.shadowBlur=0;
+    if(Math.random()<.18) spawnParts(x+w*.3+Math.random()*w*.4,y+h,`rgba(160,160,160,${Math.random()*.2})`,1);
+  } else {
+    ctx.fillStyle="#ff2200cc";ctx.shadowColor="#ff0000";ctx.shadowBlur=8;
+    rr(x+w*.07,y+h*.88,w*.26,h*.12,2);rr(x+w*.67,y+h*.88,w*.26,h*.12,2);
+    ctx.shadowBlur=0;
+  }
+  ctx.restore();
+}
+
+function drawCoin(x,y,w,h){
+  ctx.save();
+  const cx = x + w/2, cy = y + h/2, r = Math.min(w,h)/2;
+  const g = ctx.createRadialGradient(cx - r*0.2, cy - r*0.2, r*0.15, cx, cy, r);
+  g.addColorStop(0,'#fff8b0'); g.addColorStop(0.3,'#ffd86a'); g.addColorStop(1,'#dd9900');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.beginPath(); ctx.arc(cx - r*0.18, cy - r*0.28, r*0.28, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+// ── Spawn ────────────────────────────────────────────────────────────────────
+function spawn(){
+  if(cooldown>0){cooldown--;return;}
+  if(obs.length>0 && obs[obs.length-1].y < dynamicGap()) return;
+  let ln; do{ln=Math.floor(Math.random()*3);}while(ln===lastLane);
+  lastLane=ln;
+  const lx=RL+(ln+.5)*(RW/3);
+  // sometimes spawn a collectible coin instead of an obstacle
+  if(Math.random() < 0.35){
+    obs.push({type:'coin', x:lx-player.w*0.3, y:-player.h*0.8, w:player.w*0.6, h:player.h*0.6, col:'#ffd700', collected:false});
+  } else {
+    obs.push({type:'obs', x:lx-player.w/2, y:-player.h*1.5, w:player.w, h:player.h, col:COLS[Math.floor(Math.random()*COLS.length)], passed:false});
+  }
+  cooldown=Math.floor(dynamicCooldown());
+}
+
+function updPlayer(d){
+  // smooth lane interpolation towards targetX
+  const lerp = Math.min(0.22, d * 6);
+  player.x += (targetX - player.x) * lerp;
+  player.x = Math.max(RL+2, Math.min(RR-player.w-2, player.x));
+}
+
+// ── LEADERBOARD via JSONBin.io ───────────────────────────────────────────────
+// Setup (einmalig, ~3 Minuten):
+//
+//  SCHRITT 1 — Account: https://jsonbin.io → kostenlos registrieren
+//
+//  SCHRITT 2 — API Key: Dashboard → oben rechts Avatar → "API Keys"
+//              → "Secret Key" kopieren → unten bei JSONBIN_API_KEY eintragen
+//
+//  SCHRITT 3 — Bin erstellen: Dashboard → "+ Create Bin"
+//              Inhalt: { "scores": [] }
+//              Name: StemRacing   →  Bin speichern
+//              Die Bin-ID steht in der URL: jsonbin.io/b/XXXXXXXXXXXXXXXX
+//              → unten bei JSONBIN_BIN_ID eintragen
+//
+//  SCHRITT 4 — Bin öffentlich lesbar machen (damit alle Scores sehen können):
+//              Bin öffnen → rechts "Settings" → "Make Public" aktivieren
+//
+//  Alle Spieler mit dieser HTML-Datei teilen dann dieselbe Bin → echtes Leaderboard!
+// ─────────────────────────────────────────────────────────────────────────────
+const JSONBIN_API_KEY = "$2a$10$uAEKZOO0YeUsPjUk.nEjfetm3RtmQYH6J/Iu/oUI5C2piGRZEYoZW";   // ← Pflicht
+const JSONBIN_BIN_ID  = "69a8c66dae596e708f5ffa94";          // ← Pflicht (fest, gleich für alle!)
+const JSONBIN_BASE    = "https://api.jsonbin.io/v3";
+
+function lbConfigured(){
+  return !JSONBIN_API_KEY.includes("DEIN_API_KEY") && !JSONBIN_BIN_ID.includes("DEINE_BIN");
+}
+
+async function submitScore(name, scoreVal, difficulty){
+  if(!lbConfigured()) return;
+  try {
+    // 1. Aktuellen Stand lesen
+    const rGet = await fetch(JSONBIN_BASE + "/b/" + JSONBIN_BIN_ID + "/latest", {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    if(!rGet.ok) return;
+    const current = await rGet.json();
+    let scores = current.record.scores || [];
+    scores.push({ name: name.toUpperCase().slice(0,12), score: scoreVal, diff: difficulty, ts: Date.now() });
+    scores.sort((a,b) => b.score - a.score);
+    scores = scores.slice(0, 200);
+    // 2. Zurückschreiben
+    await fetch(JSONBIN_BASE + "/b/" + JSONBIN_BIN_ID, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_API_KEY },
+      body: JSON.stringify({ scores })
+    });
+    // Notify parent window (index.html) so it can update its leaderboard or forward score
+    try{ if(window.parent && window.parent !== window){ window.parent.postMessage({ type: 'stemracing_score', name: name.toUpperCase().slice(0,12), score: scoreVal, diff: difficulty }, '*'); } }catch(e){}
+  } catch(e){ console.warn("LB submit failed:", e); }
+}
+
+async function fetchLeaderboard(filter="all"){
+  if(!lbConfigured()) return "not_configured";
+  try {
+    const r = await fetch(JSONBIN_BASE + "/b/" + JSONBIN_BIN_ID + "/latest", {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    if(!r.ok) return null;
+    const d = await r.json();
+    let scores = d.record.scores || [];
+    if(filter !== "all") scores = scores.filter(e => e.diff === filter);
+    const best = {};
+    scores.forEach(e => {
+      const k = e.name + "|" + e.diff;
+      if(!best[k] || e.score > best[k].score) best[k] = e;
+    });
+    return Object.values(best).sort((a,b) => b.score - a.score).slice(0,20);
+  } catch(e){ console.warn("LB fetch failed:", e); return null; }
+}
+
+function renderLeaderboard(entries, myName, myScore){
+  const list=document.getElementById("lb-list");
+  if(entries==="not_configured"){
+    list.innerHTML='<div class="lb-err">⚙️ API Key nicht eingetragen.<br><br>Öffne die HTML-Datei im Texteditor<br>und trage deinen JSONBin-Key ein.</div>';
+    return;
+  }
+  if(entries===null){
+    list.innerHTML='<div class="lb-err">⚠️ Verbindung zu JSONBin fehlgeschlagen.<br>Prüfe deinen API Key.</div>';
+    return;
+  }
+  if(entries.length===0){ list.innerHTML='<div class="lb-empty">Noch keine Einträge 🏎</div>'; return; }
+  const medals=["🥇","🥈","🥉"];
+  list.innerHTML=entries.map((e,i)=>{
+    const isMe=e.name===(myName||"").toUpperCase() && e.score===myScore;
+    const isGold=i===0;
+    return `<div class="lb-row ${isMe?"me":""} ${isGold?"gold":""}">
+      <span class="rank">${medals[i]||(("#"+(i+1)))}</span>
+      <span class="lbname">${e.name}</span>
+      <span class="diff-badge badge-${e.diff}">${e.diff}</span>
+      <span class="pts">${e.score.toLocaleString('de-DE')}</span>
+    </div>`;
+  }).join("");
+}
+
+async function openLeaderboard(myName="", myScore=0){
+  document.getElementById("lb-panel").classList.remove("hidden");
+  document.getElementById("lb-list").innerHTML='<div class="lb-loading">Laden...</div>';
+  const entries=await fetchLeaderboard(lbFilter);
+  renderLeaderboard(entries, myName, myScore);
+}
+
+// ── Game Over ─────────────────────────────────────────────────────────────────
+async function gameOver(){
+  running=false;
+  if(score>hs){hs=score;localStorage.setItem("srhs",hs);}
+  // notify parent page (index) even if leaderboard backend isn't configured
+  try{ if(window.parent && window.parent !== window){ window.parent.postMessage({ type: 'stemracing_score', name: (playerName||'').toUpperCase().slice(0,12), score: score, diff: diff }, '*'); } }catch(e){}
+  await submitScore(playerName, score, diff);
+  const ov=document.getElementById("overlay");
+  const isNew=score>=hs;
+  ov.innerHTML=`
+    <h2>💥 CRASH!</h2>
+    <div class="sbox">
+      <div class="lbl">Score — ${playerName}</div>
+      <div class="val">${score.toLocaleString('de-DE')}</div>
+      <div class="best">${isNew?"🏆 Neuer Highscore!":"Best: "+hs.toLocaleString('de-DE')}</div>
+    </div>
+    <div class="drow">
+      <button class="btn dbtn ${diff==="easy"?"on":""}" data-d="easy">Easy</button>
+      <button class="btn dbtn ${diff==="normal"?"on":""}" data-d="normal">Normal</button>
+      <button class="btn dbtn ${diff==="hard"?"on":""}" data-d="hard">Hard</button>
+    </div>
+    <button class="action-btn" id="sb">🔄 Nochmal</button>
+    <button class="action-btn sec" id="lbBtn2">🏆 Leaderboard</button>`;
+  ov.classList.remove("hidden");
+  ov.querySelectorAll(".dbtn").forEach(b=>{
+    b.addEventListener("click",()=>{
+      ov.querySelectorAll(".dbtn").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on"); diff=b.dataset.d;
+    });
+  });
+  document.getElementById("sb").addEventListener("click",startGame);
+  document.getElementById("lbBtn2").addEventListener("click",()=>openLeaderboard(playerName,score));
+}
+
+// ── Main Loop ─────────────────────────────────────────────────────────────────
+function loop(ts){
+  if(!running)return;
+  const d=Math.min((ts-lastT)/16.67,3); lastT=ts;
+  const cfg=DS[diff];
+  roadOff+=speed*d; speed+=cfg.m*d;
+  ctx.clearRect(0,0,W,H);
+  drawRoad(); updPlayer(d); updParts(d); drawParts();
+  drawCar(player.x,player.y,player.w,player.h,"#00ee77",true);
+  spawn();
+  let crash=false;
+  obs.forEach(o=>{
+    o.y+=speed*d;
+    if(o.type==='coin'){
+      // coin drawing and collection
+      drawCoin(o.x,o.y,o.w,o.h);
+      const pad = Math.min(player.w, o.w) * 0.2;
+      if(!o.collected && o.x+pad < player.x+player.w-pad && o.x+o.w-pad > player.x+pad && o.y+pad < player.y+player.h-pad && o.y+o.h-pad > player.y+pad){
+        o.collected = true; score += 50; spawnParts(o.x+o.w/2, o.y+o.h/2, '#ffd700', 8);
+      }
+    } else {
+      if(!o.passed && o.y > player.y + player.h){ o.passed = true; score += 10; }
+      drawCar(o.x,o.y,o.w,o.h,o.col,false);
+      const pad=player.w*.1;
+      if(o.x+pad<player.x+player.w-pad && o.x+o.w-pad>player.x+pad && o.y+pad<player.y+player.h-pad && o.y+o.h-pad>player.y+pad){
+        for(let i=0;i<4;i++){
+          spawnParts(player.x+player.w/2,player.y+player.h/2,"#ff4400");
+          spawnParts(o.x+o.w/2,o.y+o.h/2,o.col);
+        }
+        crash=true;
+      }
+    }
+  });
+  // remove offscreen obstacles and collected coins
+  obs = obs.filter(o => (o.type==='coin' ? (!o.collected && o.y < H + o.h*2) : o.y < H + o.h*2));
+  score++;
+
+  // FIX 2: plain integer string — no toLocaleString in the hot loop (avoids width jitter)
+  document.getElementById("sc").textContent=score;
+  document.getElementById("sp").textContent=(speed/cfg.s).toFixed(1)+"x";
+  document.getElementById("bs").textContent=Math.max(hs,score);
+
+  if(crash){gameOver();return;}
+  requestAnimationFrame(loop);
+}
+
+// ── Input ─────────────────────────────────────────────────────────────────────
+function changeLane(dir){
+  lane = Math.max(0, Math.min(2, lane + dir));
+  targetX = RL + (lane + 0.5) * (RW/3) - player.w/2;
+}
+
+// keyboard: left/right -> lane change
+document.addEventListener("keydown", e=>{
+  if(e.key === "ArrowLeft"){ changeLane(-1); e.preventDefault(); }
+  if(e.key === "ArrowRight"){ changeLane(1); e.preventDefault(); }
+});
+
+// Buttons: single tap to change lane
+const lb2 = document.getElementById("left-btn"), rb2 = document.getElementById("right-btn");
+if(lb2 && rb2){
+  ["touchstart","mousedown"].forEach(ev=>{
+    lb2.addEventListener(ev, e=>{ changeLane(-1); e.preventDefault(); }, {passive:false});
+    rb2.addEventListener(ev, e=>{ changeLane(1); e.preventDefault(); }, {passive:false});
+  });
+}
+
+// swipe on canvas
+let swipeStartX = null;
+canvas.addEventListener('touchstart', e => { swipeStartX = e.touches[0].clientX; }, {passive:true});
+canvas.addEventListener('touchend', e => {
+  if(swipeStartX === null) return;
+  const dx = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX - swipeStartX : 0;
+  if(dx > 40) changeLane(-1); else if(dx < -40) changeLane(1);
+  swipeStartX = null;
+});
+
+// Difficulty buttons (start screen)
+document.querySelectorAll(".dbtn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("#overlay .dbtn").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); diff=b.dataset.d;
+  });
+});
+
+// Leaderboard filter tabs
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",async()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    t.classList.add("on"); lbFilter=t.dataset.t;
+    document.getElementById("lb-list").innerHTML='<div class="lb-loading">Laden...</div>';
+    const entries=await fetchLeaderboard(lbFilter);
+    renderLeaderboard(entries,playerName,0);
+  });
+});
+
+document.getElementById("lbClose").addEventListener("click",()=>document.getElementById("lb-panel").classList.add("hidden"));
+document.getElementById("lbBtn").addEventListener("click",()=>openLeaderboard(playerName,0));
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+function startGame(){
+  const inp=document.getElementById("playerName");
+  if(inp){ playerName=(inp.value||"Noob").trim().toUpperCase()||"Noob"; localStorage.setItem("srname",playerName); }
+  if(isT) document.getElementById("controls").style.display="flex";
+  document.getElementById("overlay").classList.add("hidden");
+  document.getElementById("lb-panel").classList.add("hidden");
+  initGame(); lastT=performance.now(); requestAnimationFrame(loop);
+}
+
+document.getElementById("sb").addEventListener("click",startGame);
+window.addEventListener("resize", resize);
+if(window.visualViewport) window.visualViewport.addEventListener("resize", resize);
+const sn=localStorage.getItem("srname");
+if(sn) document.getElementById("playerName").value=sn;
+document.getElementById("bs").textContent=hs;
+resize();
+</script>
+</body>
+</html>

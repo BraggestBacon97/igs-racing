@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turbo Lance Purple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7000a3;
+            --primary-dark: #5a0080;
+            --accent: #ff006e;
+            --accent-light: #ff4d94;
+            --dark-bg: #0f0f15;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c0;
+            --border: #2d2d4a;
+            --success: #00d084;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(112, 0, 163, 0.1) 0%, rgba(255, 0, 110, 0.05) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 2rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 77, 148, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-logo img {
+            width: 120px;
+            height: auto;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin: 0;
+        }
+
+        header p {
+            color: #b0b0c0;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* ========== NAVIGATION - TAB STYLE ========== */
+        nav {
+            background-color: var(--card-bg);
+            padding: 0;
+            max-width: 1200px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(112, 0, 163, 0.15);
+        }
+
+        .main-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .main-tabs > li {
+            position: relative;
+        }
+
+        .main-tabs > li > a {
+            display: block;
+            padding: 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .main-tabs > li:last-child > a {
+            border-right: none;
+        }
+
+        .main-tabs > li > a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        .main-tabs > li > a:hover {
+            color: var(--text-primary);
+            background-color: rgba(112, 0, 163, 0.2);
+        }
+
+        .main-tabs > li > a:hover::before {
+            width: 100%;
+        }
+
+        .main-tabs > li > a.active {
+            color: var(--accent);
+            background-color: rgba(112, 0, 163, 0.3);
+        }
+
+        .main-tabs > li > a.active::before {
+            width: 100%;
+        }
+
+        /* ========== SUB-TABS ========== */
+        .subtab-content {
+            display: none;
+            padding: 0.5rem 1.5rem;
+            background-color: rgba(112, 0, 163, 0.1);
+            border-top: 1px solid var(--border);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtab-content.active {
+            display: block;
+        }
+
+        .subtabs {
+            display: flex;
+            gap: 0;
+            list-style: none;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+
+        .subtabs li {
+            position: relative;
+        }
+
+        .subtabs a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .subtabs a:hover {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+            background-color: rgba(255, 0, 110, 0.1);
+        }
+
+        .subtabs a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        main {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        main h2 {
+            font-size: 2.5rem;
+            margin: 2rem 0 1.5rem 0;
+            color: var(--accent);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        main h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 2px;
+        }
+
+        main h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        main p {
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        main a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        main a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-light);
+            transition: width 0.3s ease;
+        }
+
+        main a:hover {
+            color: var(--accent);
+        }
+
+        main a:hover::after {
+            width: 100%;
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(112, 0, 163, 0.1);
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(112, 0, 163, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: var(--accent);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ========== IMAGE ========== */
+        .featured-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 15px;
+            border: 2px solid var(--accent);
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(255, 0, 110, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .featured-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 48px rgba(255, 0, 110, 0.3);
+        }
+
+        .image-caption {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        /* ========== SPONSOR GRID ========== */
+        .sponsors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .sponsor-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .sponsor-card:hover {
+            border-color: var(--accent);
+            background-color: rgba(112, 0, 163, 0.15);
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px rgba(255, 0, 110, 0.2);
+        }
+
+        .sponsor-card img {
+            max-width: 80%;
+            max-height: 100px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sponsor-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .sponsor-card h4 {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .sponsor-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .sponsor-card:hover p {
+            color: var(--text-primary);
+        }
+
+        .sponsor-card a {
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--primary-dark) 100%);
+            color: var(--text-secondary);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid var(--accent);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section {
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .contact-info {
+            background-color: rgba(112, 0, 163, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            margin: 1rem 0;
+        }
+
+        .contact-info p {
+            margin: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 2rem 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-tabs {
+                grid-template-columns: 1fr;
+            }
+
+            .main-tabs > li > a {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            main {
+                padding: 0 1rem;
+            }
+
+            main h2 {
+                font-size: 1.8rem;
+            }
+
+            .subtabs {
+                flex-direction: column;
+            }
+
+            .subtabs a {
+                border-bottom: none;
+                border-left: 4px solid transparent;
+                padding-left: 2rem;
+            }
+
+            .subtabs a:hover {
+                border-left-color: var(--accent);
+                border-bottom-color: transparent;
+            }
+
+            .subtabs a.active {
+                border-left-color: var(--accent);
+                border-bottom-color: transparent;
+            }
+
+            .sponsors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* */
+        
+    </style>
+</head>
+<body>
+    <!-- ========== KONFIGURATION ========== -->
+    <!-- Body -->
+    <script>
+        // ================================================================
+        // ---------------------------BODY---------------------------------
+        // ================================================================
+        const CONFIG = {
+            teamName: "Turbo Lance Purple",
+            schoolName: "IGS Wilhelmshaven",
+            
+            sponsors: [
+                {
+                    name: "PrintUniq",
+                    logo: "bilder/printuniq_logo_white.png",
+                    url: "https://printuniq.de",
+                    description: "Druck Partner"
+                },
+                {
+                    name: "Belz Werbetechnik",
+                    logo: "bilder/belz-werbetechnik-logo.png",
+                    url: "https://www.belz-werbetechnik.de/index.php",
+                    description: "Druck und Gestalltung"
+                },
+                {
+                    name: "IGS Wilhelmshaven",
+                    logo: "bilder/igs-logo.jpg",
+                    url: "https://www.igswhv.de/",
+                    description: "Unsere Schule"
+                },
+                {
+                    name: "SimScale",
+                    logo: "bilder/simscale-logo.jpg",
+                    url: "https://simscale.com",
+                    description: "Simulations-Partner"
+                }
+            ],
+            
+            // Kontaktinformationen
+            contacts: {
+                teamEmail: "team.turbo.lance@gmail.com",
+                teamEmailNote: "Wird mindestens jeden Freitag kontrolliert, in Ferienzeiten irregulär"
+            }
+        };
+    </script>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="header-logo">
+                <a href="beemovie.html">
+                    <img src="bilder/logo.png" alt="Turbo_Lance_Purple Logo"></a>
+                
+            </div>
+            <div>
+                <h1 id="teamTitle">Turbo lance Purple</h1>
+                <p><span id="schoolName">IGS Wilhelmshaven</span></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION WITH TABS -->
+    <nav>
+        <ul class="main-tabs">
+            <li><a href="javascript:void(0)" class="tab-link active" data-tab="0">Was ist F1 in Schools?</a></li>
+            <li><a href="javascript:void(0)" class="tab-link" data-tab="1">Unser Team</a></li>
+            <li><a href="javascript:void(0)" class="tab-link" data-tab="2">Sponsoren</a></li>
+            <li><a href="javascript:void(0)" class="tab-link" data-tab="3">Kosten & Material</a></li>
+        </ul>
+
+        <!-- SUB-TABS UNTER JEDEM TAB -->
+        <div id="subtab-0" class="subtab-content active">
+            <ul class="subtabs">
+                <li><a href="javascript:void(0)" class="subtab-link active" data-subtab="0-0">Überblick</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="0-1">Regelwerk</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="0-2">Wettbewerbe</a></li>
+            </ul>
+        </div>
+
+        <div id="subtab-1" class="subtab-content">
+            <ul class="subtabs">
+                <li><a href="javascript:void(0)" class="subtab-link active" data-subtab="1-0">Teaminfo</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="1-1">Erfolge</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="1-2">Mitglieder</a></li>
+            </ul>
+        </div>
+
+        <div id="subtab-2" class="subtab-content">
+            <ul class="subtabs">
+                <li><a href="javascript:void(0)" class="subtab-link active" data-subtab="2-0">Hauptsponsoren</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="2-1">Partner</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="2-2">Sponsor werden</a></li>
+            </ul>
+        </div>
+
+        <div id="subtab-3" class="subtab-content">
+            <ul class="subtabs">
+                <li><a href="javascript:void(0)" class="subtab-link active" data-subtab="3-0">Material</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="3-1">Budget</a></li>
+                <li><a href="javascript:void(0)" class="subtab-link" data-subtab="3-2">Finanzierung</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- TAB 0: Was ist F1 in Schools? -->
+        <div id="content-0-0" class="content-section active">
+            <h2>Unser Instagram-Kanal!</h2>
+            <div class="card">
+                <p class="card-text">
+                    Aktuelle Informationen und vorhaben unseres Teams direkt hier!
+                </p>
+                <p class="card-text">
+                    <a href="https://www.instagram.com/turbo_lance_purple?igsh=MXdwMDU2M251emdzbQ=="><img src="bilder/instagram.png" alt="Instagram"></a>
+                </p>
+                <p>
+                    (Einfach Scannen, oder draufklicken.)
+                </p>
+            </div>
+            <h2>Was ist Formula 1 in Schools?</h2>
+            <div class="card">
+                <p class="card-text">
+                    Formula 1 in Schools ist ein internationaler MINT-Wettbewerb, bei dem Schülerinnen und Schüler im Team ein echtes Formel-1-Rennwagen-Modell konstruieren, bauen und rennen lassen. Es kombiniert Ingenieurwissenschaften, Technologie, Mathematik und Kreativität in einem spannenden Wettkampf.
+                </p>
+            </div>
+            <h3>🏁 Die Violet Viper - Unser Rennwagen aus dem Jahr 2025</h3>
+            <img src="bilder/violet viper.png" alt="Die Violet Viper" class="featured-image">
+            <p class="image-caption">Die Violet Viper: Platz 2 in Niedersachsen</p>
+
+            <h3>🏁 Der TLP26 - Unser Rennwagen aus dem Jahr 2026</h3>
+            <img src="bilder/tlp26.png" alt="TLP26" class="featured-image">
+            <p class="image-caption">Der TLP26: Platz 3 in Niedersachsen</p>
+        </div>
+
+        <div id="content-0-1" class="content-section" style="display: none;">
+            <h2>Regelwerk & Anforderungen</h2>
+            <div class="card">
+                <div class="card-title">📋 Technische Anforderungen</div>
+                <p class="card-text">
+                    Der Rennwagen muss strenge technische Vorgaben erfüllen, einschließlich Gewichtsbeschränkungen, Abmessungen und Sicherheitsstandards. Jedes Team muss sein Auto konstruieren und testen, bevor es bei der Meisterschaft antretet.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">🎯 Bewertungskriterien</div>
+                <p class="card-text">
+                    Teams werden nicht nur nach ihrer Rennleistung bewertet, sondern auch nach Konstruktion, Teamarbeit, technischer Dokumentation, Präsentation und Unternehmertätigkeit.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title"> Offizielle Regelwerke der STEMRACING GERMANY</div>
+                    <a href="https://stemracing.de/downloads/">Regelwerke (stand 2025/26)</a>
+            </div>
+        </div>
+
+        <div id="content-0-2" class="content-section" style="display: none;">
+            <h2>Wettbewerbe & Veranstaltungen</h2>
+            <div class="card">
+                <div class="card-title">🏆 Meisterschaft Nord-West 2025</div>
+                <p class="card-text">
+                    Unsere bisherige Erfolgsgeschichte: DIE KI'S erreichten den 2. Platz in Niedersachsen und den 9. Platz in der regionalen Gesamtplatzierung!
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">🌍 Homepage der StemRacing Germany für aktuelle Infos</div>
+                <p class="card-text">
+                    <a href="https://stemracing.de/">Hier geht es zur Offiziellen "StemRacing Germany" Website</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 1: Unser Team -->
+        <div id="content-1-0" class="content-section" style="display: none;">
+            <h2>Über Turbo Lance Purple (ehemals Die KI's)</h2>
+            <div class="card">
+                <p class="card-text">
+                    .......
+                </p>
+            </div>
+            <h3>🎓 ......</h3>
+            <div class="card">
+                <p class="card-text">
+                    .......
+                </p>
+            </div>
+        </div>
+
+        <div id="content-1-1" class="content-section" style="display: none;">
+            <h2>Unsere Erfolge</h2>
+            <div class="card">
+                <div class="card-title">🥈 2. Platz in Niedersachsen (2025)</div>
+                <p class="card-text">
+                    Bei der Meisterschaft Nord-West erreichten wir den beeindruckenden 2. Platz in Niedersachsen!
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">🚀 9. Platz Regionale Gesamt-Platzierung (2025)</div>
+                <p class="card-text">
+                    Unter vielen starken Teams aus der gesamten Region erreichten wir den 9. Platz in der Gesamtwertung
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">🥉 3. Platz in Niedersachsen (2026)</div>
+                <p class="card-text">
+                    Bei der Meisterschaft Nord-West erreichten wir den 3. Platz in Niedersachsen!
+                </p>
+            </div>
+        </div>
+
+        <div id="content-1-2" class="content-section" style="display: none;">
+            <h2>Team-Mitglieder</h2>
+            <p class="card-text" style="color: var(--text-secondary); margin: 1.5rem 0;">
+                DIE KI'S bestehen aus drei passionierten Schülern der IGS Wilhelmshaven. Jedes Mitglied bringt unterschiedliche Fähigkeiten und Perspektiven zum Team. Hier lernt ihr uns kennen!
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                <!-- Team Member 1 -->
+                <div style="background-color: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 20px rgba(255, 0, 110, 0.2)'; this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #7000a3, #5a0080); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        <img src="bilder/eoz.png" alt="Eoz" class="featured-image">
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: var(--accent); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Zoe Midecke</div>
+                        <div style="color: var(--accent-light); font-weight: 600; margin-bottom: 1rem;">!!ROLLE!!</div>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                            !!AUFGABE/N!!
+                        </p>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.8rem;">
+                            <strong>Fokus:</strong> !!FOKUS!!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div style="background-color: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 20px rgba(255, 0, 110, 0.2)'; this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #7000a3, #5a0080); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        <img src="bilder/dang.png" alt="Dang" class="featured-image">
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: var(--accent); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Dang Phuc Le</div>
+                        <div style="color: var(--accent-light); font-weight: 600; margin-bottom: 1rem;">!!ROLLE!!</div>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                            Sponsoren. Zertifizierter 
+                            <span id="virtual">
+                                Weeb
+                            </span>
+                           <audio id="virtual-audio" src="Geoxor - Virtual - Geoxor.mp3"></audio> 
+                        </p>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.8rem;">
+                            <strong>Fokus:</strong> !!FOKUS!!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div style="background-color: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 20px rgba(255, 0, 110, 0.2)'; this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #7000a3, #5a0080); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        <img src="bilder/noah.jpg" alt="Noah" class="featured-image">
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: var(--accent); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Noah Schmidt</div>
+                        <div style="color: var(--accent-light); font-weight: 600; margin-bottom: 1rem;">!!ROLLE!!</div>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                            !!AUFGABE/N!!
+                        </p>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.8rem;">
+                            <strong>Fokus:</strong> !!FOKUS!!
+                        </p>
+                    </div>
+                </div> 
+                <!-- Team Member 4 -->
+                 <div style="background-color: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 20px rgba(255, 0, 110, 0.2)'; this.style.transform='translateY(-5px)'" onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #7000a3, #5a0080); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        <img src="bilder/fiete.png" alt="Fiete" class="featured-image">
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: var(--accent); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Fiete Pfannenschmidt</div>
+                        <div style="color: var(--accent-light); font-weight: 600; margin-bottom: 1rem;">!!ROLLE!!</div>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                            Programierung und gestalltung der Website. Hört gerne
+                            <span id="badapple">
+                                Bad Apple.
+                            </span>
+
+                            <audio id="badapple-audio" src="01. Bad Apple!!.mp3"></audio>
+
+                        </p>
+                        <p class="card-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.8rem;">
+                            <strong>Fokus:</strong> Design und Funktionalität der Website.
+                        </p>
+                    </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">!!TEAM-TEXT!!</div>
+                <p class="card-text">
+                    !!KLEINER TEXT ÜBER UNSER TEAM!! keine ahnung was ich schreiben soll. maybe kommt das auch weg?
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 2: Sponsoren -->
+        <div id="content-2-0" class="content-section" style="display: none;">
+            <h2>Unsere Hauptsponsoren</h2>
+            <div class="card">
+                <p class="card-text">
+                    Wir sind dankbar für die Unterstützung unserer Sponsoren. Sie ermöglichen es uns, hochwertige Materialien zu beschaffen und innovative Lösungen zu entwickeln. Klicke auf einen Sponsor, um mehr zu erfahren!
+                </p>
+            </div>
+            <h3>🤝 Sponsoring Partner</h3>
+            <div class="sponsors-grid" id="sponsorsGrid">
+                <!-- Wird dynamisch mit JavaScript gefüllt -->
+            </div>
+        </div>
+
+        <div id="content-2-1" class="content-section" style="display: none;">
+            <h2>Technische Partner</h2>
+            <div class="card">
+                <div class="card-title">⚙️ SimScale</div>
+                <p class="card-text">
+                    SimScale unterstützt uns mit hochmoderner Simulationssoftware zur Optimierung unseres Rennwagen-Designs. Mit CFD-Analysen (Computational Fluid Dynamics) können wir die Aerodynamik perfektionieren.
+                </p>
+            </div>
+        </div>
+
+        <div id="content-2-2" class="content-section" style="display: none;">
+            <h2>Werden Sie Sponsor</h2>
+            <div class="card">
+                <p class="card-text">
+                    Interessieren Sie sich dafür, Turbo Lance Purple zu unterstützen? Wir suchen Sponsoren und Partner, die unseren Traum von einem Championship-Rennwagen ermöglichen möchten. Kontaktieren Sie uns für weitere Informationen!
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 3: Kosten & Material -->
+        <div id="content-3-0" class="content-section" style="display: none;">
+            <h2>Materialien & Komponenten</h2>
+            <div class="card">
+                <div class="card-title">🔧 Verwendete Materialien</div>
+                <p class="card-text">
+                    Unser Rennwagen wird aus dem 3D-Druck gefertigt und konstruiert um optimale Performance bei minimalem Gewicht zu erreichen.
+                </p>
+            </div>
+            <div class="card">
+                <div class="card-title">⚙️ Komponenten</div>
+                <p class="card-text">
+                    Von den Rädern über das Getriebe bis zur Aerodynamik - jede Komponente wird sorgfältig ausgedruckt und optimiert, um maximale Geschwindigkeit und Effizienz zu erreichen.
+                </p>
+            </div>
+        </div>
+
+        <div id="content-3-1" class="content-section" style="display: none;">
+            <h2>Projektbudget</h2>
+            <div class="card">
+                <div class="card-title">💰 Kostenübersicht</div>
+                <p class="card-text">
+                    Das Projekt erfordert ein beträchtliches Budget für hochwertige Materialien, Werkzeuge, Software und Transport. Durch strategisches Sponsoring und Partnerschaften können wir diese Kosten effizient decken.
+                </p>
+            </div>
+        </div>
+
+        <div id="content-3-2" class="content-section" style="display: none;">
+            <h2>Finanzierungsstrategie</h2>
+            <div class="card">
+                <div class="card-title">📊 Finanzielle Planung</div>
+                <p class="card-text">
+                    Unsere Finanzierung basiert auf mehreren Säulen: Schulunterstützung, Sponsorschaften, lokale Partnerschaften. Zusammen ermöglichen diese es uns, ein Weltklasse-Projekt zu realisieren.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>📬 Kontakt</h3>
+                <div class="contact-info">
+                    <p><strong>Team Email:</strong> <a href="#" id="teamEmailLink" style="color: var(--accent-light);">Loading...</a></p>
+                    <p id="teamEmailNote" style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-secondary);"></p>
+                </div>
+                <div>
+                    <a id="schoolEmailLink" ></a>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-section">
+                <h3>🏢 Sponsoren & Partner</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Wir danken unseren Unterstützern</p>
+                <div class="sponsors-grid" id="footerSponsorsGrid">
+                    <!-- Wird dynamisch mit JavaScript gefüllt -->
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p>© 2026 Turbo Lance Purple</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ================================================================
+        // DYNAMISCHE INHALTE AUS KONFIGURATION LADEN
+        // ================================================================
+        
+        function initializeFromConfig() {
+            // Header initialisieren
+            document.getElementById('teamTitle').textContent = CONFIG.teamName;
+            document.getElementById('schoolName').textContent = CONFIG.schoolName;
+            
+            // Kontakt-Links initialisieren
+            const teamEmailLink = document.getElementById('teamEmailLink');
+            teamEmailLink.href = `mailto:${CONFIG.contacts.teamEmail}`;
+            teamEmailLink.textContent = CONFIG.contacts.teamEmail;
+            
+            const teamEmailNote = document.getElementById('teamEmailNote');
+            teamEmailNote.textContent = CONFIG.contacts.teamEmailNote;
+            
+            const schoolEmailLink = document.getElementById('schoolEmailLink');
+            schoolEmailLink.href = `mailto:${CONFIG.contacts.schoolContact}`;
+            schoolEmailLink.textContent = CONFIG.contacts.schoolContact;
+            
+            // Sponsor-Grid generieren
+            generateSponsorGrid();
+        }
+
+        function generateSponsorGrid() {
+            const mainGrid = document.getElementById('sponsorsGrid');
+            const footerGrid = document.getElementById('footerSponsorsGrid');
+            let mainHTML = '';
+            let footerHTML = '';
+
+            CONFIG.sponsors.forEach(sponsor => {
+                const sponsorCard = `
+                    <div class="sponsor-card">
+                        <a href="${sponsor.url}" target="_blank" rel="noopener noreferrer" title="Besuche ${sponsor.name}">
+                            <img src="${sponsor.logo}" alt="${sponsor.name} Logo">
+                            <h4>${sponsor.name}</h4>
+                            <p>${sponsor.description}</p>
+                        </a>
+                    </div>
+                `;
+                mainHTML += sponsorCard;
+                footerHTML += sponsorCard;
+            });
+
+            mainGrid.innerHTML = mainHTML;
+            footerGrid.innerHTML = footerHTML;
+        }
+
+        // ================================================================
+        // TAB-NAVIGATION FUNKTIONALITÄT
+        // ================================================================
+        
+        document.querySelectorAll('.tab-link').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabIndex = this.getAttribute('data-tab');
+                
+                // Entferne active-Klasse von allen Tabs und Inhalten
+                document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(c => c.style.display = 'none');
+                
+                // Setze active-Klasse auf aktuellen Tab
+                this.classList.add('active');
+                document.getElementById(`subtab-${tabIndex}`).classList.add('active');
+                
+                // Zeige ersten Subinhalt des Tabs
+                const firstSubtab = document.querySelector(`[data-subtab="${tabIndex}-0"]`);
+                if (firstSubtab) {
+                    firstSubtab.classList.add('active');
+                    document.getElementById(`content-${tabIndex}-0`).style.display = 'block';
+                }
+            });
+        });
+
+        // ================================================================
+        // SUB-TAB NAVIGATION
+        // ================================================================
+        
+        document.querySelectorAll('.subtab-link').forEach(subtab => {
+            subtab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const subtabId = this.getAttribute('data-subtab');
+                const [tabIndex, subIndex] = subtabId.split('-');
+                
+                // Entferne active-Klasse von allen Subtabs und Inhalten
+                document.querySelectorAll(`[data-subtab^="${tabIndex}-"]`).forEach(st => {
+                    st.classList.remove('active');
+                });
+                document.querySelectorAll(`[id^="content-${tabIndex}-"]`).forEach(c => {
+                    c.style.display = 'none';
+                });
+                
+                // Setze active-Klasse
+                this.classList.add('active');
+                document.getElementById(`content-${subtabId}`).style.display = 'block';
+            });
+        });
+
+        // ================================================================
+        // INITIALISIERUNG BEIM LADEN
+        // ================================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFromConfig();
+        });
+    </script>
+    <script>
+document.getElementById("badapple").addEventListener("click", () => {
+    const audio = document.getElementById("badapple-audio");
+    audio.currentTime = 0;  // startet immer von vorne
+    audio.play();
+});
+document.getElementById("virtual").addEventListener("click", () => {
+    const audio = document.getElementById("virtual-audio");
+    audio.currentTime = 0;
+    audio.play();
+})
+</script>
+
+</body>
+</html>
